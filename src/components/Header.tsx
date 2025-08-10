@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Phone, Mail, MapPin } from 'lucide-react'
-import Link from 'next/link'
+import Image from 'next/image'
 
 const navigation = [
     { name: 'Trang chủ', href: '/home' },
@@ -72,37 +72,44 @@ export default function Header() {
                         >
                             <div className="relative">
                                 <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full blur-sm opacity-60"></div>
-                                <img
+                                <Image
                                     src="/images/logo.png"
                                     alt="Vựa mít Khoa"
-                                    className="relative h-10 w-10 rounded-full object-cover border-2 border-white shadow-lg"
+                                    width={40}
+                                    height={40}
+                                    className="relative rounded-full object-cover border-2 border-white shadow-lg"
                                 />
                             </div>
                             <div className="flex flex-col">
-                                <h1 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                                <span className={`font-bold text-lg ${isScrolled ? 'text-gray-800' : 'text-white'}`}>
                                     Vựa Mít Khoa
-                                </h1>
-                                <p className="text-xs text-gray-600">Mít ngon từ đồng ruộng</p>
+                                </span>
+                                <span className={`text-xs ${isScrolled ? 'text-gray-600' : 'text-emerald-100'}`}>
+                                    Thu mua mít giá cao
+                                </span>
                             </div>
                         </motion.div>
 
                         {/* Desktop Navigation */}
-                        <nav className="hidden md:flex items-center space-x-8">
-                            {navigation.map((item, index) => (
+                        <nav className="hidden md:flex space-x-8">
+                            {navigation.map((item) => (
                                 <motion.a
                                     key={item.name}
                                     href={item.href}
-                                    className="relative text-gray-700 hover:text-green-600 font-medium transition-colors duration-300"
-                                    initial={{ opacity: 0, y: -20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.1 }}
+                                    className={`relative px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                                        isScrolled 
+                                            ? 'text-gray-700 hover:text-green-600' 
+                                            : 'text-white hover:text-emerald-200'
+                                    }`}
                                     whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                 >
                                     {item.name}
                                     <motion.div
-                                        className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-green-500 to-emerald-500"
-                                        whileHover={{ width: "100%" }}
-                                        transition={{ duration: 0.3 }}
+                                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-500"
+                                        initial={{ scaleX: 0 }}
+                                        whileHover={{ scaleX: 1 }}
+                                        transition={{ duration: 0.2 }}
                                     />
                                 </motion.a>
                             ))}
@@ -110,55 +117,55 @@ export default function Header() {
 
                         {/* CTA Button */}
                         <motion.button
-                            className="hidden md:block bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                            whileHover={{ scale: 1.05 }}
+                            className="hidden md:block bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                            whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(34, 197, 94, 0.3)" }}
                             whileTap={{ scale: 0.95 }}
                         >
-                            Liên hệ ngay
+                            📞 Gọi ngay
                         </motion.button>
 
                         {/* Mobile menu button */}
                         <motion.button
-                            className="md:hidden p-2 rounded-lg bg-white/10 backdrop-blur-sm"
+                            className="md:hidden p-2 rounded-lg"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            whileTap={{ scale: 0.9 }}
+                            whileTap={{ scale: 0.95 }}
                         >
-                            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            {isMenuOpen ? (
+                                <X className={`w-6 h-6 ${isScrolled ? 'text-gray-800' : 'text-white'}`} />
+                            ) : (
+                                <Menu className={`w-6 h-6 ${isScrolled ? 'text-gray-800' : 'text-white'}`} />
+                            )}
                         </motion.button>
                     </div>
                 </div>
 
-                {/* Mobile Menu */}
+                {/* Mobile menu */}
                 <AnimatePresence>
                     {isMenuOpen && (
                         <motion.div
-                            className="md:hidden bg-white/95 backdrop-blur-lg border-t border-gray-200"
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
+                            className="md:hidden bg-white/95 backdrop-blur-lg border-t border-gray-200 shadow-lg"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <div className="px-4 py-6 space-y-4">
-                                {navigation.map((item, index) => (
+                            <div className="px-4 py-4 space-y-3">
+                                {navigation.map((item) => (
                                     <motion.a
                                         key={item.name}
                                         href={item.href}
-                                        className="block text-gray-700 hover:text-green-600 font-medium py-2"
-                                        initial={{ x: -20, opacity: 0 }}
-                                        animate={{ x: 0, opacity: 1 }}
-                                        transition={{ delay: index * 0.1 }}
+                                        className="block px-4 py-3 text-gray-800 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors duration-200"
                                         onClick={() => setIsMenuOpen(false)}
+                                        whileHover={{ x: 5 }}
                                     >
                                         {item.name}
                                     </motion.a>
                                 ))}
                                 <motion.button
-                                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-full font-semibold mt-4"
-                                    initial={{ y: 20, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.5 }}
+                                    className="w-full mt-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-lg font-semibold"
+                                    whileTap={{ scale: 0.95 }}
                                 >
-                                    Đặt hàng ngay
+                                    📞 Gọi ngay
                                 </motion.button>
                             </div>
                         </motion.div>

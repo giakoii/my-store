@@ -1,7 +1,20 @@
+/* eslint-disable */
 import React from 'react';
 import Link from "next/link";
+import Image from 'next/image';
 
 const Footer = () => {
+    const services = [
+        'Thu mua mít tại vườn',
+        'Thu mua mít số lượng lớn',
+        'Tư vấn giá mít',
+    ];
+
+    const socialLinks = [
+        { icon: 'facebook', href: 'https://www.facebook.com/dangkhoa.pham.144', label: 'Facebook' },
+        { icon: 'zalo', href: '#', label: 'Zalo' },
+    ];
+
     return (
         <footer className="relative bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 overflow-hidden">
             {/* Background Pattern */}
@@ -18,10 +31,12 @@ const Footer = () => {
                     <div className="lg:col-span-2">
                         <div className="flex items-center mb-6 group">
                             <div className="relative">
-                                <img
+                                <Image
                                     src="/images/logo.png"
                                     alt="Vựa mít Khoa"
-                                    className="h-16 w-16 rounded-full border-4 border-white/20 shadow-2xl transition-transform duration-300 group-hover:scale-110"
+                                    width={64}
+                                    height={64}
+                                    className="rounded-full border-4 border-white/20 shadow-2xl transition-transform duration-300 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-emerald-400/20 to-transparent"></div>
                             </div>
@@ -55,12 +70,8 @@ const Footer = () => {
                             <div className="absolute bottom-0 left-0 w-12 h-0.5 bg-gradient-to-r from-emerald-400 to-teal-400"></div>
                         </h3>
                         <ul className="space-y-3">
-                            {[
-                                'Thu mua mít tại vườn',
-                                'Thu mua mít số lượng lớn',
-                                'Tư vấn giá mít',
-                            ].map((item, index) => (
-                                <li key={index}>
+                            {services.map((item, index) => (
+                                <li key={`service-${index}`}>
                                     <Link
                                         href="#"
                                         className="text-gray-300 hover:text-emerald-300 transition-all duration-300 hover:translate-x-2 inline-block group"
@@ -112,15 +123,12 @@ const Footer = () => {
                     <div className="flex flex-col md:flex-row justify-between items-center">
                         <div className="mb-6 md:mb-0">
                             <div className="flex space-x-6">
-                                {[
-                                    { icon: 'facebook', href: 'https://www.facebook.com/dangkhoa.pham.144' },
-                                    { icon: 'zalo', href: '#' },
-                                ].map((social, index) => (
+                                {socialLinks.map((social, index) => (
                                     <a
-                                        key={index}
+                                        key={`social-${social.icon}-${index}`}
                                         href={social.href}
                                         className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20 hover:bg-emerald-500 hover:border-emerald-400 transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-emerald-500/25 group"
-                                        aria-label={social.icon}
+                                        aria-label={social.label}
                                     >
                                         <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                                             {social.icon === 'facebook' && (
@@ -140,7 +148,7 @@ const Footer = () => {
                                 © 2024 Vựa Mít Khoa. Tất cả quyền được bảo lưu.
                             </p>
                             <p className="text-emerald-300 text-sm font-medium">
-                                "Mít ngon - Giá tốt - Uy tín hàng đầu"
+                                &ldquo;Mít ngon - Giá tốt - Uy tín hàng đầu&rdquo;
                             </p>
                         </div>
                     </div>

@@ -28,21 +28,6 @@ export default function Home() {
     }
   ]
 
-  const mitTypes = [
-    {
-      name: 'Mít Thái siêu ngọt',
-      price: '25,000 - 35,000 VNĐ/kg',
-      description: 'Mít Thái có vị ngọt đậm đà, thịt dày, ít hạt',
-      image: '/images/mit-thai.jpg'
-    },
-    {
-      name: 'Mít ruột đỏ',
-      price: '30,000 - 45,000 VNĐ/kg',
-      description: 'Mít ruột đỏ giàu dinh dưỡng, hương vị đặc biệt',
-      image: '/images/mit-ruot-do.jpg'
-    },
-  ]
-
   const stats = [
     { icon: Users, number: '500+', label: 'Nông dân tin tưởng' },
     { icon: TrendingUp, number: '1000+', label: 'Tấn mít thu mua/năm' },
@@ -244,7 +229,9 @@ export default function Home() {
           >
             <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
               Tại Sao Chọn
-              <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> Vựa Mít Khoa?</span>
+              <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                {' '}Vựa Mít Khoa?
+              </span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Chúng tôi cam kết mang đến dịch vụ thu mua mít tốt nhất với giá cả hợp lý nhất

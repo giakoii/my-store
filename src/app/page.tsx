@@ -1,75 +1,13 @@
 'use client'
 import { motion } from 'framer-motion'
-import { Truck, Scale, Phone, Star, Users, TrendingUp, Award } from 'lucide-react'
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Carousel from "@/components/Carousel"
 import Link from 'next/link'
+import { services, stats, carouselImages } from '@/data/mockData'
+import { ANIMATION_VARIANTS } from '@/constants'
 
 export default function Home() {
-  const services = [
-    {
-      icon: Truck,
-      title: 'Thu mua tận nơi',
-      description: 'Nhận đến tận vườn để thu mua, tiết kiệm thời gian và chi phí vận chuyển cho bà con nông dân.',
-      color: 'from-blue-500 to-blue-600'
-    },
-    {
-      icon: Scale,
-      title: 'Cân đo chính xác',
-      description: 'Sử dụng cân điện tử chính xác, minh bạch trong khâu cân đo để đảm bảo quyền lợi.',
-      color: 'from-green-500 to-green-600'
-    },
-    {
-      icon: Phone,
-      title: 'Hỗ trợ 24/7',
-      description: 'Đội ngũ tư vấn sẵn sàng hỗ trợ bà con 24/7, giải đáp mọi thắc mắc về giá cả. Giá cả luôn được cập nhật mỗi ngày',
-      color: 'from-purple-500 to-purple-600'
-    }
-  ]
-
-  const stats = [
-    { icon: Users, number: '500+', label: 'Nông dân tin tưởng' },
-    { icon: TrendingUp, number: '1000+', label: 'Tấn mít thu mua/năm' },
-    { icon: Award, number: '5+', label: 'Năm kinh nghiệm' },
-    { icon: Star, number: '4.9/5', label: 'Đánh giá từ khách hàng' }
-  ]
-
-  // Carousel images data
-  const carouselImages = [
-    {
-      src: '/images/home.webp',
-      alt: 'Vựa mít Khoa - Thu mua mít tận nơi',
-      title: 'Thu Mua Mít Tận Nơi',
-      description: 'Chúng tôi đến tận vườn để thu mua mít với giá cao'
-    },
-    {
-      src: '/images/home1.webp',
-      alt: 'Vựa mít Khoa – Mua nhanh, giá tốt',
-      title: 'Vựa mít Khoa – Mua nhanh, giá tốt',
-      description: 'Chúng tôi cam kết thu mua mít với giá cao, thanh toán ngay'
-    },
-    {
-      src: '/images/home2.webp',
-      alt: 'Đối tác tin cậy',
-      title: 'Đối Tác Tin Cậy',
-      description: 'Hơn 500 nông dân đã tin tưởng và hợp tác với chúng tôi'
-    },
-    {
-      src: '/images/home3.webp',
-      alt: 'Vựa mít Khoa - Thu mua mít tận nơi',
-      title: 'Thu Mua Mít Tận Nơi',
-      description: 'Chúng tôi đến tận vườn để thu mua mít với giá cao'
-    },
-    {
-      src: '/images/home4.webp',
-      alt: 'Mít chất lượng cao',
-      title: 'Vựa mít Khoa – Mua nhanh, giá tốt',
-      description: 'Chúng tôi cam kết thu mua mít với giá cao, thanh toán ngay'
-    },
-
-  ]
-
   return (
     <div className="min-h-screen">
       <Header />
@@ -90,14 +28,11 @@ export default function Home() {
             {/* Left Column - Hero Content */}
             <motion.div
               className="text-center lg:text-left"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              {...ANIMATION_VARIANTS.fadeInLeft}
             >
               <motion.h1
                 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                {...ANIMATION_VARIANTS.scaleIn}
                 transition={{ duration: 1, delay: 0.2 }}
               >
                 <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
@@ -115,8 +50,7 @@ export default function Home() {
 
               <motion.p
                 className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                {...ANIMATION_VARIANTS.fadeInUp}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
                 Thu mua mít tận nơi với giá cao.
@@ -125,8 +59,7 @@ export default function Home() {
 
               <motion.div
                 className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-12"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                {...ANIMATION_VARIANTS.fadeInUp}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
                 <motion.button
@@ -151,13 +84,12 @@ export default function Home() {
               {/* Quick Stats */}
               <motion.div
                 className="grid grid-cols-2 gap-4"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
+                {...ANIMATION_VARIANTS.fadeInUp}
                 transition={{ duration: 0.8, delay: 0.8 }}
               >
                 {stats.map((stat, index) => (
                   <motion.div
-                    key={stat.label}
+                    key={`stat-${stat.label.replace(/\s+/g, '-')}`}
                     className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -175,8 +107,7 @@ export default function Home() {
             {/* Right Column - Carousel */}
             <motion.div
               className="relative"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
+              {...ANIMATION_VARIANTS.fadeInRight}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
               <div className="relative">
@@ -199,26 +130,25 @@ export default function Home() {
 
               {/* Caption under carousel */}
               <motion.div
-                className="text-center mt-6"
+                className="mt-6 text-center lg:text-left"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 1 }}
+                transition={{ delay: 1.2 }}
               >
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  Hình Ảnh Thực Tế
-                </h3>
-                <p className="text-sm text-gray-600">
-                  Quá trình thu mua mít của chúng tôi
+                <p className="text-gray-600 text-sm">
+                  <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent font-semibold">
+                    Vựa Mít Khoa?
+                  </span>
+                  {' '}- Hình ảnh thực tế từ vườn mít
                 </p>
               </motion.div>
             </motion.div>
-
           </div>
         </div>
       </section>
 
       {/* Services Section */}
-      <section id="services" className="py-20 bg-white">
+      <section id="services" className="py-20 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="text-center mb-16"
@@ -228,40 +158,36 @@ export default function Home() {
             viewport={{ once: true }}
           >
             <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-              Tại Sao Chọn
-              <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                {' '}Vựa Mít Khoa?
-              </span>
+              Dịch Vụ
+              <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent"> Chuyên Nghiệp</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Chúng tôi cam kết mang đến dịch vụ thu mua mít tốt nhất với giá cả hợp lý nhất
+              Chúng tôi cung cấp dịch vụ thu mua mít toàn diện, từ tư vấn đến thu mua tận nơi
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {services.map((service, index) => (
               <motion.div
-                key={service.title}
-                className="group relative bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500"
+                key={`service-${service.title.replace(/\s+/g, '-')}`}
+                className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
+                transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                whileHover={{ y: -10 }}
+                whileHover={{ y: -10, scale: 1.02 }}
               >
-                <div className={`w-16 h-16 bg-gradient-to-r ${service.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-6 mx-auto`}>
                   <service.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-4">{service.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{service.description}</p>
-
-                {/* Decorative element */}
-                <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-4 text-center">{service.title}</h3>
+                <p className="text-gray-600 leading-relaxed text-center">{service.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
+
       <Footer />
     </div>
   )

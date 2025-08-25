@@ -3,20 +3,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import Image from 'next/image'
-
-interface CarouselProps {
-  images: {
-    src: string
-    alt: string
-    title?: string
-    description?: string
-  }[]
-  autoSlide?: boolean
-  autoSlideInterval?: number
-  showDots?: boolean
-  showArrows?: boolean
-  height?: string
-}
+import { CarouselProps } from '@/types'
+import { generateId } from '@/utils'
 
 export default function Carousel({
   images,
@@ -25,7 +13,7 @@ export default function Carousel({
   showDots = true,
   showArrows = true,
   height = 'h-96'
-}: CarouselProps) {
+}: Readonly<CarouselProps>) {
   const [currentIndex, setCurrentIndex] = useState(0)
 
   // Auto slide effect
@@ -53,20 +41,26 @@ export default function Carousel({
     setCurrentIndex(index)
   }
 
-  if (images.length === 0) return null
+  if (images.length === 0) {
+    return (
+      <div className={`${height} bg-gray-200 rounded-2xl flex items-center justify-center`}>
+        <p className="text-gray-500">Không có hình ảnh</p>
+      </div>
+    )
+  }
 
   return (
-    <div className={`relative ${height} overflow-hidden rounded-xl shadow-2xl group`}>
-      {/* Images */}
+    <div className={`relative ${height} rounded-2xl overflow-hidden bg-gray-100 shadow-2xl`}>
+      {/* Main Image Container */}
       <div className="relative w-full h-full">
         <AnimatePresence mode="wait">
           <motion.div
-            key={currentIndex}
+            key={`carousel-image-${currentIndex}-${generateId()}`}
+            className="absolute inset-0"
             initial={{ opacity: 0, x: 300 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -300 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="absolute inset-0"
           >
             <Image
               src={images[currentIndex].src}
@@ -76,28 +70,17 @@ export default function Carousel({
               priority={currentIndex === 0}
             />
 
-            {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-
-            {/* Content overlay */}
+            {/* Overlay with content */}
             {(images[currentIndex].title || images[currentIndex].description) && (
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.6 }}
-                >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                   {images[currentIndex].title && (
-                    <h3 className="text-2xl md:text-3xl font-bold mb-2">
-                      {images[currentIndex].title}
-                    </h3>
+                    <h3 className="text-2xl font-bold mb-2">{images[currentIndex].title}</h3>
                   )}
                   {images[currentIndex].description && (
-                    <p className="text-lg opacity-90 max-w-2xl">
-                      {images[currentIndex].description}
-                    </p>
+                    <p className="text-sm opacity-90">{images[currentIndex].description}</p>
                   )}
-                </motion.div>
+                </div>
               </div>
             )}
           </motion.div>
@@ -107,51 +90,52 @@ export default function Carousel({
       {/* Navigation Arrows */}
       {showArrows && images.length > 1 && (
         <>
-          <button
+          <motion.button
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-10"
             onClick={goToPrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-2 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            aria-label="Previous image"
           >
             <ChevronLeftIcon className="w-6 h-6" />
-          </button>
-          <button
+          </motion.button>
+
+          <motion.button
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 z-10"
             onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-2 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            aria-label="Next image"
           >
             <ChevronRightIcon className="w-6 h-6" />
-          </button>
+          </motion.button>
         </>
       )}
 
-      {/* Dots indicator */}
+      {/* Dot Indicators */}
       {showDots && images.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-          {images.map((image, index) => (
-            <button
-              key={`carousel-${image.src}-${image.alt}`.replace(/\s+/g, '-').toLowerCase()}
-              onClick={() => goToSlide(index)}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+          {images.map((_, index) => (
+            <motion.button
+              key={`carousel-dot-${index}-${generateId()}`}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
                 index === currentIndex
-                  ? 'bg-white scale-110'
-                  : 'bg-white/50 hover:bg-white/70'
+                  ? 'bg-white scale-125'
+                  : 'bg-white/50 hover:bg-white/75'
               }`}
+              onClick={() => goToSlide(index)}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
+              aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
       )}
 
-      {/* Progress bar */}
+      {/* Loading indicator */}
       {autoSlide && images.length > 1 && (
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20">
-          <motion.div
-            className="h-full bg-white"
-            initial={{ width: "0%" }}
-            animate={{ width: "100%" }}
-            transition={{
-              duration: autoSlideInterval / 1000,
-              ease: "linear",
-              repeat: Infinity,
-            }}
-          />
+        <div className="absolute top-4 right-4 z-10">
+          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
         </div>
       )}
     </div>

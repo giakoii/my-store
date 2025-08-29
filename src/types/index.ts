@@ -64,6 +64,39 @@ export interface DailyPrice {
   mitCho: number;
 }
 
+// Batch pricing types for API - Updated to match actual API response
+export interface PriceDetail {
+  priceId: number;
+  productTypeId: number;
+  typeName: string;
+  price: number;
+}
+
+export interface BatchPricingRequest {
+  title: string;
+  description: string;
+  priceDetails: {
+    productTypeId: number;
+    price: number;
+  }[];
+}
+
+export interface BatchPricingResponse {
+  pricingBatchId: number;
+  title: string;
+  description: string;
+  createdAt: string;
+  priceDetails: PriceDetail[];
+}
+
+export interface ApiPricingResponse {
+  response: BatchPricingResponse[];
+  success: boolean;
+  messageId: string;
+  message: string;
+  detailErrors: null | string[];
+}
+
 // Component types
 export interface CarouselImage {
   src: string;

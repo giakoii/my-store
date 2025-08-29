@@ -1,8 +1,6 @@
-// filepath: /Users/giakhoi/CodeProject/WebstormProjects/vua-mit-khoa/src/hooks/useAuth.ts
-
 import { useState, useEffect } from 'react';
 import { authService } from '@/services/authService';
-import { User, SessionResponse } from '@/types';
+import { SessionResponse } from '@/types';
 
 export function useAuth() {
   const [user, setUser] = useState<SessionResponse | null>(null);
@@ -25,7 +23,7 @@ export function useAuth() {
             setUser(null);
             setIsAuthenticated(false);
           }
-        } catch (error) {
+        } catch {
           authService.logout();
           setUser(null);
           setIsAuthenticated(false);
@@ -41,7 +39,7 @@ export function useAuth() {
     initAuth();
   }, []);
 
-  const login = async (userData: User) => {
+  const login = async () => {
     // Sau khi login thành công, lấy thông tin session
     if (authService.isAuthenticated()) {
       const response = await authService.getSession();

@@ -35,13 +35,13 @@ export default function LoginPage() {
 
     setLoading(true)
     setError('')
-
+    
     try {
       const response = await authService.checkUserRole(phoneNumber)
-
+      
       if (response.success && response.data) {
         setUserRole(response.data.userRole)
-
+        
         if (response.data.userRole === UserRole.Customer) {
           // Customer login trực tiếp không cần thấy form
           await handleCustomerAutoLogin()
@@ -71,7 +71,7 @@ export default function LoginPage() {
       const response = await authService.login(loginData)
 
       if (response.success && response.data) {
-        await authLogin(response.data)
+        await authLogin()
         router.push('/')
       } else {
         setError(response.error || 'Đăng nhập thất bại')
@@ -89,7 +89,7 @@ export default function LoginPage() {
     try {
       const loginData = {
         grant_type: 'password',
-        username: formData.username,
+        username: 'admin@vuamitkhoa.com', // Dùng username mặc định cho admin
         password: formData.adminPassword,
         phoneNumber: phoneNumber
       }
@@ -97,7 +97,7 @@ export default function LoginPage() {
       const response = await authService.login(loginData)
 
       if (response.success && response.data) {
-        await authLogin(response.data)
+        await authLogin()
         router.push('/')
       } else {
         setError(response.error || 'Đăng nhập thất bại')
@@ -207,23 +207,6 @@ export default function LoginPage() {
                 <p className="text-sm text-blue-600">
                   Vui lòng nhập thông tin đăng nhập
                 </p>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="email"
-                    value={formData.username}
-                    onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
-                    placeholder="Nhập email"
-                    required
-                  />
-                </div>
               </div>
 
               <div className="mb-6">

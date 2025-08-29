@@ -1,6 +1,6 @@
 // filepath: /Users/giakhoi/CodeProject/WebstormProjects/vua-mit-khoa/src/services/pricingService.ts
 
-import { PricingData, DailyPrice, ApiResponse } from '@/types';
+import { PricingData, DailyPrice, ApiResponse, BatchPricingRequest, BatchPricingResponse, ApiPricingResponse } from '@/types';
 import apiClient from '@/libraries/apiClient';
 
 interface ApiError {
@@ -13,21 +13,75 @@ interface ApiError {
 }
 
 class PricingService {
-  async getPricings(): Promise<ApiResponse<PricingData[]>> {
+  async getBatchPricings(): Promise<ApiResponse<BatchPricingResponse[]>> {
     try {
-      const response = await apiClient.get('/pricing');
+      const response = await apiClient.get<ApiPricingResponse>('/api/v1/Pricing/batches');
+
+      // Handle API response structure
+      if (response.data.success && response.data.response) {
+        return {
+          success: true,
+          data: response.data.response,
+          message: 'Lấy danh sách giá thành công',
+        };
+      } else {
+        return {
+          success: false,
+          error: response.data.message || 'Có lỗi xảy ra khi lấy danh sách giá',
+        };
+      }
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      return {
+        success: false,
+        error: apiError?.response?.data?.message || 'Có lỗi xảy ra khi lấy danh sách giá',
+      };
+    }
+  }
+
+  async createBatchPricing(data: BatchPricingRequest): Promise<ApiResponse<BatchPricingResponse>> {
+    try {
+      const response = await apiClient.post('/api/v1/Pricing/batch', data);
       return {
         success: true,
         data: response.data,
-        message: 'Lấy dữ liệu giá thành công',
+        message: 'Tạo giá mới thành công',
       };
     } catch (error: unknown) {
       const apiError = error as ApiError;
       return {
         success: false,
-        error: apiError?.response?.data?.message || 'Có lỗi xảy ra khi lấy dữ liệu giá',
+        error: apiError?.response?.data?.message || 'Có lỗi xảy ra khi tạo giá mới',
       };
     }
+  }
+
+  // Giữ lại các method cũ để tương thích
+  async getPricings(): Promise<ApiResponse<PricingData[]>> {
+    // Sử dụng API mới
+    const result = await this.getBatchPricings();
+    if (result.success && result.data) {
+      // Chuyển đổi dữ liệu từ BatchPricingResponse sang PricingData
+      const transformedData: PricingData[] = result.data.flatMap(batch =>
+        batch.priceDetails.map(detail => ({
+          id: `${batch.pricingBatchId}-${detail.productTypeId}`,
+          name: detail.typeName || `Loại ${detail.productTypeId}`,
+          price: detail.price,
+          unit: 'VND/kg',
+          createAt: batch.createdAt || new Date().toISOString(),
+        }))
+      );
+      return {
+          success: result.success,
+          data: transformedData,
+          message: result.message,
+          error: result.error
+        };
+    }
+    return {
+      success: false,
+      error: result.error || 'Không thể tải dữ liệu giá'
+    };
   }
 
   async createPricing(data: Omit<PricingData, 'id'>): Promise<ApiResponse<PricingData>> {

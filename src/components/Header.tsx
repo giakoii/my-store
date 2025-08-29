@@ -8,10 +8,12 @@ import { NAVIGATION_ITEMS, CONTACT_INFO } from '@/constants'
 import { useScrollPosition } from '@/hooks/useScrollPosition'
 import { useAuth } from '@/hooks/useAuth'
 import Button from '@/components/Button'
+import AdminPriceForm from '@/components/AdminPriceForm'
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+    const [showPriceForm, setShowPriceForm] = useState(false)
     const { isScrolled } = useScrollPosition()
     const { user, loading, isAuthenticated, logout } = useAuth()
 
@@ -19,6 +21,11 @@ export default function Header() {
         logout()
         setIsUserMenuOpen(false)
         window.location.href = '/'
+    }
+
+    const handleShowPriceForm = () => {
+        setShowPriceForm(true)
+        setIsUserMenuOpen(false)
     }
 
     return (
@@ -158,21 +165,20 @@ export default function Header() {
                                                                 ? 'bg-blue-100 text-blue-700' 
                                                                 : 'bg-green-100 text-green-700'
                                                         }`}>
-                                                            {user.role === 'Admin' ? 'Quản trị viên' : 'Khách hàng'}
+                                                            {user.role === 'Admin' ? 'Chủ cửa hàng' : 'Khách hàng'}
                                                         </span>
                                                     </div>
 
                                                     <div className="py-1">
                                                         {/* Admin exclusive feature */}
                                                         {user.role === 'Admin' && (
-                                                            <Link
-                                                                href="/admin/daily-price"
-                                                                className="flex items-center px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 transition-colors border-b border-gray-100"
-                                                                onClick={() => setIsUserMenuOpen(false)}
+                                                            <button
+                                                                onClick={handleShowPriceForm}
+                                                                className="flex items-center w-full px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 transition-colors border-b border-gray-100"
                                                             >
                                                                 <DollarSign className="w-4 h-4 mr-3" />
                                                                 Đăng giá hôm nay
-                                                            </Link>
+                                                            </button>
                                                         )}
 
                                                         <Link
@@ -272,7 +278,7 @@ export default function Header() {
                                                 ? 'bg-blue-100 text-blue-700' 
                                                 : 'bg-green-100 text-green-700'
                                         }`}>
-                                            {user.role === 'Admin' ? 'Quản trị viên' : 'Khách hàng'}
+                                            {user.role === 'Admin' ? 'Chủ cửa hàng' : 'Khách hàng'}
                                         </span>
                                     </div>
                                 )}
@@ -296,14 +302,13 @@ export default function Header() {
                                         <div className="space-y-2">
                                             {/* Admin exclusive feature for mobile */}
                                             {user?.role === 'Admin' && (
-                                                <Link
-                                                    href="/admin/daily-price"
+                                                <button
+                                                    onClick={handleShowPriceForm}
                                                     className="flex items-center py-2 text-blue-700 hover:text-blue-800 transition-colors"
-                                                    onClick={() => setIsMenuOpen(false)}
                                                 >
                                                     <DollarSign className="w-4 h-4 mr-3" />
                                                     Đăng giá hôm nay
-                                                </Link>
+                                                </button>
                                             )}
 
                                             <Link
@@ -355,6 +360,19 @@ export default function Header() {
                                 </div>
                             </div>
                         </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Admin Price Form Modal */}
+                <AnimatePresence>
+                    {showPriceForm && (
+                        <AdminPriceForm
+                            onClose={() => setShowPriceForm(false)}
+                            onSuccess={() => {
+                                setShowPriceForm(false);
+                                // Có thể thêm logic để refresh data nếu cần
+                            }}
+                        />
                     )}
                 </AnimatePresence>
             </motion.header>

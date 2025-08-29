@@ -3,37 +3,39 @@
 'use client'
 import { motion } from 'framer-motion'
 import { Calendar, TrendingUp, Star } from 'lucide-react'
-import { formatDate, formatPrice } from '@/utils'
+import { formatPrice } from '@/utils'
+
+interface PriceItem {
+  type: string
+  price: number
+  unit: string
+}
 
 interface DailyPriceCardProps {
+  title: string
   date: string
-  mitType1: number
-  mitType2: number
-  mitCL: number
-  mitCho: number
+  description?: string
+  prices: PriceItem[]
   isLatest?: boolean
 }
 
 export default function DailyPriceCard({
+  title,
   date,
-  mitType1,
-  mitType2,
-  mitCL,
-  mitCho,
+  description,
+  prices,
   isLatest = false
 }: Readonly<DailyPriceCardProps>) {
-  const priceItems = [
-    { label: 'Mít I', price: mitType1, color: 'text-green-600' },
-    { label: 'Mít II', price: mitType2, color: 'text-blue-600' },
-    { label: 'Mít CL', price: mitCL, color: 'text-orange-600' },
-    { label: 'Mít Chợ', price: mitCho, color: 'text-purple-600' }
-  ]
+  const getColorForIndex = (index: number) => {
+    const colors = ['text-green-600', 'text-blue-600', 'text-orange-600', 'text-purple-600', 'text-red-600'];
+    return colors[index % colors.length];
+  };
 
   return (
     <motion.div
       className={`relative p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 ${
         isLatest 
-          ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200' 
+          ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 ring-2 ring-green-200 ring-opacity-50' 
           : 'bg-white border border-gray-200'
       }`}
       initial={{ opacity: 0, y: 20 }}
@@ -41,91 +43,132 @@ export default function DailyPriceCard({
       whileHover={{ y: -5, scale: 1.02 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Latest Badge */}
+      {/* Latest Badge - Enhanced */}
       {isLatest && (
-        <div className="absolute -top-3 -right-3">
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center">
-            <Star className="w-3 h-3 mr-1" />
-            Mới nhất
-          </div>
+        <div className="absolute -top-4 -right-4">
+          <motion.div
+            className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center shadow-lg"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.3, type: "spring", stiffness: 500, damping: 30 }}
+          >
+            <Star className="w-4 h-4 mr-2" />
+            GIÁ MỚI NHẤT
+            <motion.div
+              className="absolute inset-0 rounded-full bg-white opacity-0"
+              animate={{
+                opacity: [0, 0.3, 0],
+                scale: [1, 1.2, 1]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          </motion.div>
         </div>
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
-          <div className={`p-2 rounded-lg ${isLatest ? 'bg-green-100' : 'bg-gray-100'}`}>
-            <Calendar className={`w-5 h-5 ${isLatest ? 'text-green-600' : 'text-gray-600'}`} />
-          </div>
-          <div>
-            <h3 className={`font-bold text-lg ${isLatest ? 'text-green-800' : 'text-gray-800'}`}>
-              Giá mít hôm nay
-            </h3>
-            <p className="text-gray-600 text-sm">tại Vựa mít Khoa</p>
-          </div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-2 text-gray-600">
+          <Calendar className="w-4 h-4" />
+          <span className={`text-sm font-medium ${isLatest ? 'text-green-700' : ''}`}>
+            {date}
+          </span>
         </div>
-        <div className="flex items-center text-gray-500">
-          <TrendingUp className="w-4 h-4 mr-1" />
-          <span className="text-sm">Cập nhật</span>
-        </div>
+        <TrendingUp className={`w-5 h-5 ${
+          isLatest ? 'text-green-500 animate-pulse' : 'text-gray-400'
+        }`} />
       </div>
 
-      {/* Date */}
-      <div className={`mb-4 p-3 rounded-lg ${isLatest ? 'bg-green-100' : 'bg-gray-50'}`}>
-        <p className={`text-center font-semibold ${isLatest ? 'text-green-800' : 'text-gray-800'}`}>
-          {formatDate(date)}
+      {/* Title - Enhanced for latest */}
+      <h3 className={`text-xl font-bold mb-2 ${
+        isLatest ? 'text-green-800' : 'text-gray-800'
+      }`}>
+        {title}
+        {isLatest && (
+          <motion.span
+            className="ml-2 text-green-600"
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            🌟
+          </motion.span>
+        )}
+      </h3>
+
+      {/* Description */}
+      {description && (
+        <p className={`text-sm mb-4 ${
+          isLatest ? 'text-green-700' : 'text-gray-600'
+        }`}>
+          {description}
         </p>
-      </div>
+      )}
 
-      {/* Price List */}
+      {/* Price List - Enhanced */}
       <div className="space-y-3">
-        {priceItems.map((item, index) => (
+        {prices.map((item, index) => (
           <motion.div
-            key={`price-${item.label.replace(/\s+/g, '-')}`}
-            className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
+            key={`${item.type}-${index}`}
+            className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
+              isLatest 
+                ? 'bg-green-50 hover:bg-green-100 border border-green-200' 
+                : 'bg-gray-50 hover:bg-gray-100'
+            }`}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
+            whileHover={{ scale: 1.02 }}
           >
-            <div className="flex items-center space-x-3">
-              <div className={`w-3 h-3 rounded-full ${item.color.replace('text-', 'bg-')}`}></div>
-              <span className="font-medium text-gray-800">{item.label}:</span>
-            </div>
+            <span className={`font-medium ${
+              isLatest ? 'text-green-800' : 'text-gray-700'
+            }`}>
+              {item.type}
+            </span>
             <div className="text-right">
-              <span className={`text-lg font-bold ${item.color}`}>
+              <span className={`text-lg font-bold ${
+                isLatest 
+                  ? 'text-green-600' 
+                  : getColorForIndex(index)
+              }`}>
                 {formatPrice(item.price)}
               </span>
-              <p className="text-xs text-gray-500">/kg</p>
+              <span className="text-xs text-gray-500 ml-1">{item.unit}</span>
+              {isLatest && (
+                <motion.span
+                  className="ml-2 text-green-500"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  ✨
+                </motion.span>
+              )}
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Contact CTA */}
+      {/* Contact CTA - Enhanced for latest */}
       <motion.div
         className="mt-6 pt-4 border-t border-gray-200"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.3 }}
       >
-        <motion.a
+        <a
           href="tel:0842879238"
-          className={`block w-full text-center py-3 rounded-lg font-semibold transition-all duration-300 ${
+          className={`w-full px-4 py-2 rounded-lg text-center font-medium transition-all duration-300 block ${
             isLatest
-              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-lg'
+              ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 shadow-lg hover:shadow-xl'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
         >
-          📞 Liên hệ ngay: 0842 879 238
-        </motion.a>
+          📞 {isLatest ? 'Gọi ngay để đặt hàng' : 'Liên hệ báo giá'}
+        </a>
       </motion.div>
-
-      {/* Decorative element */}
-      {isLatest && (
-        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-green-200/30 to-transparent rounded-bl-full -z-10"></div>
-      )}
     </motion.div>
   )
 }

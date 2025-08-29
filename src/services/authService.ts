@@ -131,6 +131,40 @@ class AuthService {
     }
   }
 
+  // Register API
+  async register(data: { fullName: string; phoneNumber: string }): Promise<ApiResponse<User>> {
+    try {
+      const response = await fetch(`${this.baseUrl}/api/v1/User/create`, {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        return {
+          success: true,
+          data: result.response,
+          message: 'Đăng ký thành công',
+        };
+      }
+
+      return {
+        success: false,
+        error: result.message || 'Đăng ký thất bại',
+      };
+    } catch {
+      return {
+        success: false,
+        error: 'Có lỗi xảy ra khi đăng ký',
+      };
+    }
+  }
+
   logout(): void {
     localStorage.remove('access_token');
     localStorage.remove('user');

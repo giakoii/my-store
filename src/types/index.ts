@@ -137,3 +137,21 @@ export interface CarouselProps {
   showArrows?: boolean;
   height?: string;
 }
+
+// Product Type API types
+export interface ProductType {
+  productTypeId: number;
+  typeName: string;
+}
+
+export interface ProductTypeResponse {
+  response: ProductType[];
+  success: boolean;
+  messageId: string;
+  message: string;
+  detailErrors: null | string[];
+}
+
+export interface CreateProductTypeRequest {
+  typeName: string;
+}

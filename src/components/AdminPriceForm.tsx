@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { pricingService } from '@/services/pricingService';
-import { BatchPricingRequest } from '@/types';
+import { productTypeService } from '@/services/productTypeService';
+import { BatchPricingRequest, ProductType } from '@/types';
 import Button from './Button';
 
 interface AdminPriceFormProps {
@@ -11,26 +12,45 @@ interface AdminPriceFormProps {
   onSuccess?: () => void;
 }
 
-const PRODUCT_TYPES = [
-  { id: 2, name: 'Mít I', placeholder: 'Giá Mít I (VND/kg)' },
-  { id: 3, name: 'Mít II', placeholder: 'Giá Mít II (VND/kg)' },
-  { id: 4, name: 'Mít CL', placeholder: 'Giá Mít CL (VND/kg)' },
-  { id: 5, name: 'Mít Chợ', placeholder: 'Giá Mít Chợ (VND/kg)' },
-];
-
 export default function AdminPriceForm({ onClose, onSuccess }: AdminPriceFormProps) {
   const [loading, setLoading] = useState(false);
+  const [loadingProductTypes, setLoadingProductTypes] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [productTypes, setProductTypes] = useState<ProductType[]>([]);
 
   const [formData, setFormData] = useState({
     title: `Giá mít hôm nay - ${new Date().toLocaleDateString('vi-VN')}`,
     description: 'Bảng giá mít cập nhật hàng ngày',
-    prices: PRODUCT_TYPES.reduce((acc, type) => {
-      acc[type.id] = '';
-      return acc;
-    }, {} as Record<number, string>)
+    prices: {} as Record<number, string>
   });
+
+  // Fetch product types on mount
+  useEffect(() => {
+    const fetchProductTypes = async () => {
+      try {
+        setLoadingProductTypes(true);
+        const response = await productTypeService.getProductTypes();
+        if (response.success && response.data) {
+          setProductTypes(response.data);
+          // Initialize prices object
+          const initialPrices = response.data.reduce((acc, type) => {
+            acc[type.productTypeId] = '';
+            return acc;
+          }, {} as Record<number, string>);
+          setFormData(prev => ({ ...prev, prices: initialPrices }));
+        } else {
+          setError(response.error || 'Không thể tải danh sách loại mít');
+        }
+      } catch {
+        setError('Có lỗi xảy ra khi tải danh sách loại mít');
+      } finally {
+        setLoadingProductTypes(false);
+      }
+    };
+
+    fetchProductTypes();
+  }, []);
 
   const handlePriceChange = (productTypeId: number, value: string) => {
     // Chỉ cho phép số
@@ -131,83 +151,96 @@ export default function AdminPriceForm({ onClose, onSuccess }: AdminPriceFormPro
             </motion.div>
           )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tiêu đề
-              </label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
-              />
+          {/* Loading Product Types */}
+          {loadingProductTypes ? (
+            <div className="text-center py-8">
+              <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">Đang tải danh sách loại mít...</p>
             </div>
+          ) : (
+            /* Form */
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tiêu đề
+                </label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  required
+                  disabled={loading}
+                />
+              </div>
 
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Mô tả
-              </label>
-              <input
-                type="text"
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
-              />
-            </div>
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mô tả
+                </label>
+                <input
+                  type="text"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  required
+                  disabled={loading}
+                />
+              </div>
 
-            {/* Price Inputs */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800">Giá các loại mít</h3>
-              {PRODUCT_TYPES.map((type) => (
-                <div key={type.id}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {type.name}
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={formData.prices[type.id]}
-                      onChange={(e) => handlePriceChange(type.id, e.target.value)}
-                      placeholder={type.placeholder}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    />
-                    {formData.prices[type.id] && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
-                        VND/kg
+              {/* Price Inputs */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-800">Giá các loại mít</h3>
+                <div className="max-h-64 overflow-y-auto space-y-3">
+                  {productTypes.map((type) => (
+                    <div key={type.productTypeId}>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {type.typeName}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.prices[type.productTypeId] || ''}
+                          onChange={(e) => handlePriceChange(type.productTypeId, e.target.value)}
+                          placeholder={`Nhập giá ${type.typeName}`}
+                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          disabled={loading}
+                        />
+                        {formData.prices[type.productTypeId] && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">
+                            VND/kg
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
 
-            {/* Submit Button */}
-            <div className="flex gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="flex-1"
-                disabled={loading}
-              >
-                Hủy
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                className="flex-1"
-                disabled={loading}
-              >
-                {loading ? 'Đang đăng...' : 'Đăng giá'}
-              </Button>
-            </div>
-          </form>
+              {/* Submit Button */}
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="flex-1"
+                  disabled={loading}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="flex-1"
+                  disabled={loading}
+                >
+                  {loading ? 'Đang đăng...' : 'Đăng giá'}
+                </Button>
+              </div>
+            </form>
+          )}
         </div>
       </motion.div>
     </div>

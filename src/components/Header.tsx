@@ -172,13 +172,14 @@ export default function Header() {
                                                     <div className="py-1">
                                                         {/* Admin exclusive feature */}
                                                         {user.role === 'Admin' && (
-                                                            <button
-                                                                onClick={handleShowPriceForm}
+                                                            <a
+                                                                href="/admin/daily-price"
                                                                 className="flex items-center w-full px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 transition-colors border-b border-gray-100"
+                                                                onClick={() => setIsUserMenuOpen(false)}
                                                             >
                                                                 <DollarSign className="w-4 h-4 mr-3" />
                                                                 Đăng giá hôm nay
-                                                            </button>
+                                                            </a>
                                                         )}
 
                                                         <Link
@@ -302,13 +303,13 @@ export default function Header() {
                                         <div className="space-y-2">
                                             {/* Admin exclusive feature for mobile */}
                                             {user?.role === 'Admin' && (
-                                                <button
-                                                    onClick={handleShowPriceForm}
+                                                <a
+                                                    href="/admin/daily-price"
                                                     className="flex items-center py-2 text-blue-700 hover:text-blue-800 transition-colors"
                                                 >
                                                     <DollarSign className="w-4 h-4 mr-3" />
                                                     Đăng giá hôm nay
-                                                </button>
+                                                </a>
                                             )}
 
                                             <Link

@@ -8,12 +8,10 @@ import { NAVIGATION_ITEMS, CONTACT_INFO } from '@/constants'
 import { useScrollPosition } from '@/hooks/useScrollPosition'
 import { useAuth } from '@/hooks/useAuth'
 import Button from '@/components/Button'
-import AdminPriceForm from '@/components/AdminPriceForm'
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
-    const [showPriceForm, setShowPriceForm] = useState(false)
     const { isScrolled } = useScrollPosition()
     const { user, loading, isAuthenticated, logout } = useAuth()
 
@@ -21,11 +19,6 @@ export default function Header() {
         logout()
         setIsUserMenuOpen(false)
         window.location.href = '/'
-    }
-
-    const handleShowPriceForm = () => {
-        setShowPriceForm(true)
-        setIsUserMenuOpen(false)
     }
 
     return (
@@ -361,19 +354,6 @@ export default function Header() {
                                 </div>
                             </div>
                         </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Admin Price Form Modal */}
-                <AnimatePresence>
-                    {showPriceForm && (
-                        <AdminPriceForm
-                            onClose={() => setShowPriceForm(false)}
-                            onSuccess={() => {
-                                setShowPriceForm(false);
-                                // Có thể thêm logic để refresh data nếu cần
-                            }}
-                        />
                     )}
                 </AnimatePresence>
             </motion.header>

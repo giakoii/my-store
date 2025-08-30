@@ -18,7 +18,6 @@ export function useAuth() {
             setUser(response.data);
             setIsAuthenticated(true);
           } else {
-            // Token không hợp lệ, xóa và logout
             authService.logout();
             setUser(null);
             setIsAuthenticated(false);
@@ -40,7 +39,6 @@ export function useAuth() {
   }, []);
 
   const login = async () => {
-    // Sau khi login thành công, lấy thông tin session
     if (authService.isAuthenticated()) {
       const response = await authService.getSession();
       if (response.success && response.data) {

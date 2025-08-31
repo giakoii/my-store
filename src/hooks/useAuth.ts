@@ -14,8 +14,8 @@ export function useAuth() {
       if (authService.isAuthenticated()) {
         try {
           const response = await authService.getSession();
-          if (response.success && response.data) {
-            setUser(response.data);
+          if (response.success && response.response) {
+            setUser(response.response);
             setIsAuthenticated(true);
           } else {
             authService.logout();
@@ -41,8 +41,8 @@ export function useAuth() {
   const login = async () => {
     if (authService.isAuthenticated()) {
       const response = await authService.getSession();
-      if (response.success && response.data) {
-        setUser(response.data);
+      if (response.success && response.response) {
+        setUser(response.response);
         setIsAuthenticated(true);
       }
     }
@@ -57,8 +57,8 @@ export function useAuth() {
   const refreshSession = async () => {
     if (authService.isAuthenticated()) {
       const response = await authService.getSession();
-      if (response.success && response.data) {
-        setUser(response.data);
+      if (response.success && response.response) {
+        setUser(response.response);
         setIsAuthenticated(true);
         return true;
       }

@@ -24,7 +24,7 @@ export const AuthApi = {
             }
         );
 
-        if (response.data.access_token) {
+        if (response.data) {
             localStorage.setItem("access_token", response.data.access_token);
             localStorage.setItem("refresh_token", response.data.refresh_token);
             localStorage.setItem("expires_in", response.data.expires_in.toString());

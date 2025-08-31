@@ -1,4 +1,4 @@
-import apiClient from "@/libraries/apiClient";
+import httpRequest from "@/api/httpRequest";
 
 interface PricingData {
     name: string;
@@ -7,5 +7,5 @@ interface PricingData {
 }
 
 export const PricingApi = {
-    selectPricings: (data: PricingData) => apiClient.post('/pricing', data),
+    selectPricings: (data: PricingData) => httpRequest.post('/pricing', data),
 }

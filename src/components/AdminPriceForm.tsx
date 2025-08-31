@@ -31,16 +31,16 @@ export default function AdminPriceForm({ onClose, onSuccess }: AdminPriceFormPro
       try {
         setLoadingProductTypes(true);
         const response = await productTypeService.getProductTypes();
-        if (response.success && response.data) {
-          setProductTypes(response.data);
+        if (response.success && response.response) {
+          setProductTypes(response.response);
           // Initialize prices object
-          const initialPrices = response.data.reduce((acc, type) => {
+          const initialPrices = response.response.reduce((acc, type) => {
             acc[type.productTypeId] = '';
             return acc;
           }, {} as Record<number, string>);
           setFormData(prev => ({ ...prev, prices: initialPrices }));
         } else {
-          setError(response.error || 'Không thể tải danh sách loại mít');
+          setError('Không thể tải danh sách loại mít');
         }
       } catch {
         setError('Có lỗi xảy ra khi tải danh sách loại mít');
@@ -99,7 +99,7 @@ export default function AdminPriceForm({ onClose, onSuccess }: AdminPriceFormPro
           onClose();
         }, 1500);
       } else {
-        setError(result.error || 'Có lỗi xảy ra khi đăng giá');
+        setError('Có lỗi xảy ra khi đăng giá');
       }
     } catch {
       setError('Có lỗi xảy ra. Vui lòng thử lại.');

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/services/authService'
 import Button from '@/components/Button'
+import {CONTACT_INFO} from "@/constants";
 
 interface FormData {
   name: string
@@ -83,7 +84,7 @@ export default function RegisterPage() {
           router.push('/login')
         }, 2000)
       } else {
-        setError(result.error || 'Đăng ký thất bại. Vui lòng thử lại.')
+        setError(result.message || 'Đăng ký thất bại. Vui lòng thử lại.')
       }
     } catch {
       setError('Có lỗi xảy ra. Vui lòng thử lại.')
@@ -188,7 +189,7 @@ export default function RegisterPage() {
                 />
               </div>
               <p className="mt-1 text-xs text-gray-500">
-                Ví dụ: 0901234567 hoặc +84901234567
+                Ví dụ: 0901234567
               </p>
             </div>
 
@@ -267,7 +268,7 @@ export default function RegisterPage() {
             className="inline-flex items-center text-green-600 hover:text-green-700 font-medium transition-colors"
           >
             <Phone className="w-4 h-4 mr-2" />
-            0842 879 238
+            {CONTACT_INFO.PHONE}
           </a>
         </motion.div>
       </motion.div>

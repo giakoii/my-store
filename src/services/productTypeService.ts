@@ -1,5 +1,5 @@
 import { ProductType, ProductTypeResponse, CreateProductTypeRequest, ApiResponse } from '@/types';
-import apiClient from '@/libraries/apiClient';
+import httpRequest from '@/api/httpRequest';
 
 interface ApiError {
   response?: {
@@ -14,25 +14,30 @@ class ProductTypeService {
   // Get all product types
   async getProductTypes(): Promise<ApiResponse<ProductType[]>> {
     try {
-      const response = await apiClient.get<ProductTypeResponse>('/api/v1/ProductType');
+      const response = await httpRequest.get<ProductTypeResponse>('/api/v1/ProductType');
 
       if (response.data.success && response.data.response) {
         return {
           success: true,
-          data: response.data.response,
-          message: 'Lấy danh sách loại mít thành công',
+          response: response.data.response,
+          message: response.data.message || 'Lấy danh sách loại mít thành công',
+          messageId: response.data.messageId,
+          detailErrors: response.data.detailErrors,
         };
       } else {
         return {
           success: false,
-          error: response.data.message || 'Có lỗi xảy ra khi lấy danh sách loại mít',
+          message: response.data.message || 'Có lỗi xảy ra khi lấy danh sách loại mít',
+          messageId: response.data.messageId || '',
+          detailErrors: response.data.detailErrors,
         };
       }
     } catch (error: unknown) {
       const apiError = error as ApiError;
       return {
         success: false,
-        error: apiError?.response?.data?.message || 'Có lỗi xảy ra khi lấy danh sách loại mít',
+        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi lấy danh sách loại mít',
+        messageId: '',
       };
     }
   }
@@ -40,17 +45,20 @@ class ProductTypeService {
   // Create new product type (Admin only)
   async createProductType(data: CreateProductTypeRequest): Promise<ApiResponse<ProductType>> {
     try {
-      const response = await apiClient.post<ProductType>('/api/v1/ProductType', data);
+      const response = await httpRequest.post<ApiResponse<ProductType>>('/api/v1/ProductType', data);
       return {
-        success: true,
-        data: response.data,
-        message: 'Tạo loại mít mới thành công',
+        success: response.data.success,
+        response: response.data.response,
+        message: response.data.message || 'Tạo loại mít mới thành công',
+        messageId: response.data.messageId,
+        detailErrors: response.data.detailErrors,
       };
     } catch (error: unknown) {
       const apiError = error as ApiError;
       return {
         success: false,
-        error: apiError?.response?.data?.message || 'Có lỗi xảy ra khi tạo loại mít mới',
+        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi tạo loại mít mới',
+        messageId: '',
       };
     }
   }

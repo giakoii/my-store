@@ -1,13 +1,32 @@
-// filepath: /Users/giakhoi/CodeProject/WebstormProjects/vua-mit-khoa/src/types/index.ts
-
 // Common types
+import {UserRole} from "@/consts/constantEnum";
+
+// Base pagination interface
+export interface PaginationRequest {
+  page?: number;
+  pageSize?: number;
+}
+
+// Specific pagination request for pricing API
+export interface PricingPaginationRequest extends PaginationRequest {
+  fromDate?: string;
+  toDate?: string;
+}
+
+export interface PaginationResponse {
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
+  message: string;
   response?: T;
-  messageId?: string;
+  messageId: string;
   detailErrors?: string[] | null;
 }
 
@@ -17,7 +36,7 @@ export interface UserRoleRequest {
 }
 
 export interface UserRoleResponse {
-  userRole: 'Customer' | 'Admin';
+  userRole: UserRole.Customer | UserRole.Admin;
 }
 
 export interface LoginData {
@@ -81,6 +100,16 @@ export interface BatchPricingRequest {
   }[];
 }
 
+export interface BatchPricingListResponse {
+  data: BatchPricingResponse[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
 export interface BatchPricingResponse {
   pricingBatchId: number;
   title: string;
@@ -90,11 +119,11 @@ export interface BatchPricingResponse {
 }
 
 export interface ApiPricingResponse {
-  response: BatchPricingResponse[];
   success: boolean;
-  messageId: string;
   message: string;
-  detailErrors: null | string[];
+  response: BatchPricingListResponse;
+  messageId: string;
+  detailErrors?: string[] | null;
 }
 
 // Component types
@@ -154,4 +183,9 @@ export interface ProductTypeResponse {
 
 export interface CreateProductTypeRequest {
   typeName: string;
+}
+
+export interface OrdersRequest {
+    page: number;
+    pageSize: number;
 }

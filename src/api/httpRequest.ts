@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiClient = axios.create({
+const httpRequest = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
     headers: {
         "Content-Type": "application/json",
@@ -8,7 +8,7 @@ const apiClient = axios.create({
 });
 
 // Add a request interceptor to include the access token in headers
-apiClient.interceptors.request.use((config) => {
+httpRequest.interceptors.request.use((config) => {
     const token = localStorage.getItem("access_token");
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -16,4 +16,4 @@ apiClient.interceptors.request.use((config) => {
     return config;
 });
 
-export default apiClient;
+export default httpRequest;

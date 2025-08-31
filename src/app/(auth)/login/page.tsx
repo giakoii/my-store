@@ -19,7 +19,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [userRole, setUserRole] = useState<'Customer' | 'Admin' | null>(null)
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -39,18 +38,14 @@ export default function LoginPage() {
     try {
       const response = await authService.checkUserRole(phoneNumber)
       
-      if (response.success && response.data) {
-        setUserRole(response.data.userRole)
-        
-        if (response.data.userRole === UserRole.Customer) {
-          // Customer login trực tiếp không cần thấy form
+      if (response.success && response.response != null) {
+        if (response.response.userRole === UserRole.Customer) {
           await handleCustomerAutoLogin()
         } else {
-          // Admin cần nhập mật khẩu
           setStep('admin-login')
         }
       } else {
-        setError(response.error || 'Không thể kiểm tra vai trò người dùng')
+        setError('Không thể kiểm tra vai trò người dùng')
       }
     } catch {
       setError('Có lỗi xảy ra. Vui lòng thử lại.')
@@ -70,11 +65,11 @@ export default function LoginPage() {
 
       const response = await authService.login(loginData)
 
-      if (response.success && response.data) {
+      if (response.success && response.response) {
         await authLogin()
         router.push('/')
       } else {
-        setError(response.error || 'Đăng nhập thất bại')
+        setError('Đăng nhập thất bại')
       }
     } catch {
       setError('Có lỗi xảy ra khi đăng nhập.')
@@ -96,14 +91,14 @@ export default function LoginPage() {
 
       const response = await authService.login(loginData)
 
-      if (response.success && response.data) {
+      if (response.success && response.response) {
         await authLogin()
         router.push('/')
       } else {
-        setError(response.error || 'Đăng nhập thất bại')
+        setError('Đăng nhập thất bại');
       }
     } catch {
-      setError('Có lỗi xảy ra. Vui lòng thử lại.')
+      setError('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setLoading(false)
     }
@@ -111,7 +106,6 @@ export default function LoginPage() {
 
   const resetToPhoneStep = () => {
     setStep('phone')
-    setUserRole(null)
     setError('')
     setFormData({ username: '', password: '', adminPassword: '' })
   }

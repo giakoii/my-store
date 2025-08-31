@@ -1,7 +1,5 @@
-// filepath: /Users/giakhoi/CodeProject/WebstormProjects/vua-mit-khoa/src/services/pricingService.ts
-
-import { PricingData, DailyPrice, ApiResponse, BatchPricingRequest, BatchPricingResponse, ApiPricingResponse } from '@/types';
-import apiClient from '@/libraries/apiClient';
+import { PricingData, DailyPrice, ApiResponse, BatchPricingRequest, BatchPricingResponse, ApiPricingResponse, BatchPricingListResponse, PricingPaginationRequest } from '@/types';
+import httpRequest from '@/api/httpRequest';
 
 interface ApiError {
   response?: {
@@ -13,56 +11,70 @@ interface ApiError {
 }
 
 class PricingService {
-  async getBatchPricings(): Promise<ApiResponse<BatchPricingResponse[]>> {
+  async getBatchPricings(params?: PricingPaginationRequest): Promise<ApiResponse<BatchPricingListResponse>> {
     try {
-      const response = await apiClient.get<ApiPricingResponse>('/api/v1/Pricing/batches');
+      const queryParams = new URLSearchParams();
+
+      if (params?.page) queryParams.append('Page', params.page.toString());
+      if (params?.pageSize) queryParams.append('PageSize', params.pageSize.toString());
+      if (params?.fromDate) queryParams.append('FromDate', params.fromDate);
+      if (params?.toDate) queryParams.append('ToDate', params.toDate);
+
+      const queryString = queryParams.toString();
+      const url = `/api/v1/Pricing/batches${queryString ? `?${queryString}` : ''}`;
+      const response = await httpRequest.get<ApiPricingResponse>(url);
 
       // Handle API response structure
       if (response.data.success && response.data.response) {
         return {
           success: true,
-          data: response.data.response,
-          message: 'Lấy danh sách giá thành công',
+          response: response.data.response,
+          message: response.data.message || 'Lấy danh sách giá thành công',
+          messageId: response.data.messageId,
+          detailErrors: response.data.detailErrors,
         };
       } else {
         return {
           success: false,
-          error: response.data.message || 'Có lỗi xảy ra khi lấy danh sách giá',
+          message: response.data.message || 'Có lỗi xảy ra khi lấy danh sách giá',
+          messageId: response.data.messageId || '',
+          detailErrors: response.data.detailErrors,
         };
       }
     } catch (error: unknown) {
       const apiError = error as ApiError;
       return {
         success: false,
-        error: apiError?.response?.data?.message || 'Có lỗi xảy ra khi lấy danh sách giá',
+        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi lấy danh sách giá',
+        messageId: '',
       };
     }
   }
 
   async createBatchPricing(data: BatchPricingRequest): Promise<ApiResponse<BatchPricingResponse>> {
     try {
-      const response = await apiClient.post('/api/v1/Pricing/batch', data);
+      const response = await httpRequest.post<ApiResponse<BatchPricingResponse>>('/api/v1/Pricing/batch', data);
       return {
-        success: true,
-        data: response.data,
-        message: 'Tạo giá mới thành công',
+        success: response.data.success,
+        response: response.data.response,
+        message: response.data.message || 'Tạo giá mới thành công',
+        messageId: response.data.messageId,
+        detailErrors: response.data.detailErrors,
       };
     } catch (error: unknown) {
       const apiError = error as ApiError;
       return {
         success: false,
-        error: apiError?.response?.data?.message || 'Có lỗi xảy ra khi tạo giá mới',
+        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi tạo giá mới',
+        messageId: '',
       };
     }
   }
 
-  // Giữ lại các method cũ để tương thích
-  async getPricings(): Promise<ApiResponse<PricingData[]>> {
-    // Sử dụng API mới
-    const result = await this.getBatchPricings();
-    if (result.success && result.data) {
-      // Chuyển đổi dữ liệu từ BatchPricingResponse sang PricingData
-      const transformedData: PricingData[] = result.data.flatMap(batch =>
+  async getPricings(params?: PricingPaginationRequest): Promise<ApiResponse<PricingData[]>> {
+    const result = await this.getBatchPricings(params);
+    if (result.success && result.response?.data) {
+      const transformedData: PricingData[] = result.response.data.flatMap(batch =>
         batch.priceDetails.map(detail => ({
           id: `${batch.pricingBatchId}-${detail.productTypeId}`,
           name: detail.typeName || `Loại ${detail.productTypeId}`,
@@ -72,64 +84,76 @@ class PricingService {
         }))
       );
       return {
-          success: result.success,
-          data: transformedData,
-          message: result.message,
-          error: result.error
-        };
+        success: result.success,
+        response: transformedData,
+        message: result.message,
+        messageId: result.messageId,
+        detailErrors: result.detailErrors,
+      };
     }
     return {
       success: false,
-      error: result.error || 'Không thể tải dữ liệu giá'
+      message: result.message || 'Không thể tải dữ liệu giá',
+      messageId: result.messageId || '',
+      detailErrors: result.detailErrors,
     };
   }
 
   async createPricing(data: Omit<PricingData, 'id'>): Promise<ApiResponse<PricingData>> {
     try {
-      const response = await apiClient.post('/pricing', data);
+      const response = await httpRequest.post<ApiResponse<PricingData>>('/pricing', data);
       return {
-        success: true,
-        data: response.data,
-        message: 'Tạo giá mới thành công',
+        success: response.data.success,
+        response: response.data.response,
+        message: response.data.message || 'Tạo giá mới thành công',
+        messageId: response.data.messageId,
+        detailErrors: response.data.detailErrors,
       };
     } catch (error: unknown) {
       const apiError = error as ApiError;
       return {
         success: false,
-        error: apiError?.response?.data?.message || 'Có lỗi xảy ra khi tạo giá mới',
+        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi tạo giá mới',
+        messageId: '',
       };
     }
   }
 
   async updatePricing(id: string, data: Partial<PricingData>): Promise<ApiResponse<PricingData>> {
     try {
-      const response = await apiClient.put(`/pricing/${id}`, data);
+      const response = await httpRequest.put<ApiResponse<PricingData>>(`/pricing/${id}`, data);
       return {
-        success: true,
-        data: response.data,
-        message: 'Cập nhật giá thành công',
+        success: response.data.success,
+        response: response.data.response,
+        message: response.data.message || 'Cập nhật giá thành công',
+        messageId: response.data.messageId,
+        detailErrors: response.data.detailErrors,
       };
     } catch (error: unknown) {
       const apiError = error as ApiError;
       return {
         success: false,
-        error: apiError?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật giá',
+        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật giá',
+        messageId: '',
       };
     }
   }
 
   async deletePricing(id: string): Promise<ApiResponse<void>> {
     try {
-      await apiClient.delete(`/pricing/${id}`);
+      const response = await httpRequest.delete<ApiResponse<void>>(`/pricing/${id}`);
       return {
-        success: true,
-        message: 'Xóa giá thành công',
+        success: response.data.success,
+        message: response.data.message || 'Xóa giá thành công',
+        messageId: response.data.messageId,
+        detailErrors: response.data.detailErrors,
       };
     } catch (error: unknown) {
       const apiError = error as ApiError;
       return {
         success: false,
-        error: apiError?.response?.data?.message || 'Có lỗi xảy ra khi xóa giá',
+        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi xóa giá',
+        messageId: '',
       };
     }
   }
@@ -164,13 +188,15 @@ class PricingService {
 
       return {
         success: true,
-        data: mockData,
+        response: mockData,
         message: 'Lấy giá hằng ngày thành công',
+        messageId: '',
       };
     } catch {
       return {
         success: false,
-        error: 'Có lỗi xảy ra khi lấy giá hằng ngày',
+        message: 'Có lỗi xảy ra khi lấy giá hằng ngày',
+        messageId: '',
       };
     }
   }

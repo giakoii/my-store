@@ -46,16 +46,16 @@ export default function AdminDailyPricePage() {
       try {
         setLoading(true)
         const response = await productTypeService.getProductTypes()
-        if (response.success && response.data) {
-          setProductTypes(response.data)
+        if (response.success && response.response) {
+          setProductTypes(response.response)
           // Initialize price form with empty prices
-          const initialPrices = response.data.reduce((acc, type) => {
+          const initialPrices = response.response.reduce((acc, type) => {
             acc[type.productTypeId] = ''
             return acc
           }, {} as Record<number, string>)
           setPriceForm(prev => ({ ...prev, prices: initialPrices }))
         } else {
-          setError(response.error || 'Không thể tải danh sách loại mít')
+          setError(response.message || 'Không thể tải danh sách loại mít')
         }
       } catch {
         setError('Có lỗi xảy ra khi tải dữ liệu')
@@ -103,10 +103,10 @@ export default function AdminDailyPricePage() {
         
         // Refresh product types
         const refreshResponse = await productTypeService.getProductTypes()
-        if (refreshResponse.success && refreshResponse.data) {
-          setProductTypes(refreshResponse.data)
+        if (refreshResponse.success && refreshResponse.response) {
+          setProductTypes(refreshResponse.response)
           // Update price form
-          const updatedPrices = refreshResponse.data.reduce((acc, type) => {
+          const updatedPrices = refreshResponse.response.reduce((acc, type) => {
             acc[type.productTypeId] = priceForm.prices[type.productTypeId] || ''
             return acc
           }, {} as Record<number, string>)
@@ -115,7 +115,7 @@ export default function AdminDailyPricePage() {
 
         setTimeout(() => setSuccess(''), 3000)
       } else {
-        setError(response.error || 'Có lỗi xảy ra khi tạo loại mít mới')
+        setError(response.message || 'Có lỗi xảy ra khi tạo loại mít mới')
       }
     } catch {
       setError('Có lỗi xảy ra. Vui lòng thử lại.')
@@ -166,7 +166,7 @@ export default function AdminDailyPricePage() {
         })
         setTimeout(() => setSuccess(''), 3000)
       } else {
-        setError(result.error || 'Có lỗi xảy ra khi đăng giá')
+        setError(result.message || 'Có lỗi xảy ra khi đăng giá')
       }
     } catch {
       setError('Có lỗi xảy ra. Vui lòng thử lại.')

@@ -26,19 +26,24 @@ class AuthService {
       if (response.ok && result.success) {
         return {
           success: true,
-          data: result.response,
-          message: 'Kiểm tra vai trò người dùng thành công',
+          response: result.response,
+          message: result.message || 'Kiểm tra vai trò người dùng thành công',
+          messageId: result.messageId,
+          detailErrors: result.detailErrors,
         };
       }
 
       return {
         success: false,
-        error: result.message || 'Không thể kiểm tra vai trò người dùng',
+        message: result.message || 'Không thể kiểm tra vai trò người dùng',
+        messageId: result.messageId || '',
+        detailErrors: result.detailErrors,
       };
     } catch {
       return {
         success: false,
-        error: 'Có lỗi xảy ra khi kiểm tra vai trò người dùng',
+        message: 'Có lỗi xảy ra khi kiểm tra vai trò người dùng',
+        messageId: '',
       };
     }
   }
@@ -75,19 +80,23 @@ class AuthService {
 
         return {
           success: true,
-          data: user,
+          response: user,
           message: 'Đăng nhập thành công',
+          messageId: result.messageId || '',
         };
       }
 
       return {
         success: false,
-        error: result.error_description || 'Đăng nhập thất bại',
+        message: result.error_description || 'Đăng nhập thất bại',
+        messageId: result.messageId || '',
+        detailErrors: result.detailErrors,
       };
     } catch {
       return {
         success: false,
-        error: 'Có lỗi xảy ra khi đăng nhập',
+        message: 'Có lỗi xảy ra khi đăng nhập',
+        messageId: '',
       };
     }
   }
@@ -98,7 +107,8 @@ class AuthService {
       if (!token) {
         return {
           success: false,
-          error: 'Không có access token',
+          message: 'Không có access token',
+          messageId: '',
         };
       }
 
@@ -114,19 +124,22 @@ class AuthService {
         const result = await response.json();
         return {
           success: true,
-          data: result,
+          response: result,
           message: 'Lấy thông tin session thành công',
+          messageId: result.messageId || '',
         };
       }
 
       return {
         success: false,
-        error: 'Không thể lấy thông tin session',
+        message: 'Không thể lấy thông tin session',
+        messageId: '',
       };
     } catch {
       return {
         success: false,
-        error: 'Có lỗi xảy ra khi lấy thông tin session',
+        message: 'Có lỗi xảy ra khi lấy thông tin session',
+        messageId: '',
       };
     }
   }
@@ -148,19 +161,24 @@ class AuthService {
       if (response.ok && result.success) {
         return {
           success: true,
-          data: result.response,
-          message: 'Đăng ký thành công',
+          response: result.response,
+          message: result.message || 'Đăng ký thành công',
+          messageId: result.messageId,
+          detailErrors: result.detailErrors,
         };
       }
 
       return {
         success: false,
-        error: result.message || 'Đăng ký thất bại',
+        message: result.message || 'Đăng ký thất bại',
+        messageId: result.messageId || '',
+        detailErrors: result.detailErrors,
       };
     } catch {
       return {
         success: false,
-        error: 'Có lỗi xảy ra khi đăng ký',
+        message: 'Có lỗi xảy ra khi đăng ký',
+        messageId: '',
       };
     }
   }

@@ -15,12 +15,6 @@ export default function DateFilter({ onFilter, loading = false, className = '' }
   const [toDate, setToDate] = useState('')
   const [hasActiveFilter, setHasActiveFilter] = useState(false)
 
-  const formatDateForInput = (date: Date): string => {
-    // Convert to Vietnam timezone (UTC+7)
-    const vietnamDate = new Date(date.getTime() + (7 * 60 * 60 * 1000))
-    return vietnamDate.toISOString().split('T')[0]
-  }
-
   const formatDateForApi = (dateString: string): string => {
     if (!dateString) return ''
     // Return date in YYYY-MM-DD format only, no time component

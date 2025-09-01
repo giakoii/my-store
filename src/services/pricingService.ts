@@ -1,14 +1,5 @@
-import { PricingData, DailyPrice, ApiResponse, BatchPricingRequest, BatchPricingResponse, ApiPricingResponse, BatchPricingListResponse, PricingPaginationRequest } from '@/types';
-import httpRequest from '@/api/httpRequest';
-
-interface ApiError {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  message?: string;
-}
+import { PricingData, DailyPrice, ApiResponse, BatchPricingRequest, BatchPricingResponse, BatchPricingListResponse, PricingPaginationRequest } from '@/types';
+import http from '@/utils/http';
 
 class PricingService {
   /**
@@ -36,30 +27,12 @@ class PricingService {
 
       // Make the GET request to the API
       const url = `/api/v1/Pricing/batches${queryString ? `?${queryString}` : ''}`;
-      const response = await httpRequest.get<ApiPricingResponse>(url);
 
-      // Handle API response structure
-      if (response.data.success && response.data.response) {
-        return {
-          success: true,
-          response: response.data.response,
-          message: response.data.message || 'Lấy danh sách giá thành công',
-          messageId: response.data.messageId,
-          detailErrors: response.data.detailErrors,
-        };
-      } else {
-        return {
-          success: false,
-          message: response.data.message || 'Có lỗi xảy ra khi lấy danh sách giá',
-          messageId: response.data.messageId || '',
-          detailErrors: response.data.detailErrors,
-        };
-      }
+      return await http.get<BatchPricingListResponse>(url);
     } catch (error: unknown) {
-      const apiError = error as ApiError;
       return {
         success: false,
-        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi lấy danh sách giá',
+        message: error instanceof Error ? error.message : 'Có lỗi xảy ra khi lấy danh sách giá',
         messageId: '',
       };
     }
@@ -71,20 +44,11 @@ class PricingService {
    */
   async createBatchPricing(data: BatchPricingRequest): Promise<ApiResponse<BatchPricingResponse>> {
     try {
-      // Send POST request to create a new batch pricing
-      const response = await httpRequest.post<ApiResponse<BatchPricingResponse>>('/api/v1/Pricing/batch', data);
-      return {
-        success: response.data.success,
-        response: response.data.response,
-        message: response.data.message || 'Tạo giá mới thành công',
-        messageId: response.data.messageId,
-        detailErrors: response.data.detailErrors,
-      };
+      return await http.post<BatchPricingResponse>('/api/v1/Pricing/batch', data);
     } catch (error: unknown) {
-      const apiError = error as ApiError;
       return {
         success: false,
-        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi tạo giá mới',
+        message: error instanceof Error ? error.message : 'Có lỗi xảy ra khi tạo giá mới',
         messageId: '',
       };
     }
@@ -103,7 +67,7 @@ class PricingService {
           name: detail.typeName || `Loại ${detail.productTypeId}`,
           price: detail.price,
           unit: 'VND/kg',
-          createAt: batch.createdAt,
+          createAt: batch.createdAt || new Date().toISOString(),
         }))
       );
       return {
@@ -124,19 +88,11 @@ class PricingService {
 
   async createPricing(data: Omit<PricingData, 'id'>): Promise<ApiResponse<PricingData>> {
     try {
-      const response = await httpRequest.post<ApiResponse<PricingData>>('/pricing', data);
-      return {
-        success: response.data.success,
-        response: response.data.response,
-        message: response.data.message || 'Tạo giá mới thành công',
-        messageId: response.data.messageId,
-        detailErrors: response.data.detailErrors,
-      };
+      return await http.post<PricingData>('/pricing', data);
     } catch (error: unknown) {
-      const apiError = error as ApiError;
       return {
         success: false,
-        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi tạo giá mới',
+        message: error instanceof Error ? error.message : 'Có lỗi xảy ra khi tạo giá mới',
         messageId: '',
       };
     }
@@ -144,19 +100,11 @@ class PricingService {
 
   async updatePricing(id: string, data: Partial<PricingData>): Promise<ApiResponse<PricingData>> {
     try {
-      const response = await httpRequest.put<ApiResponse<PricingData>>(`/pricing/${id}`, data);
-      return {
-        success: response.data.success,
-        response: response.data.response,
-        message: response.data.message || 'Cập nhật giá thành công',
-        messageId: response.data.messageId,
-        detailErrors: response.data.detailErrors,
-      };
+      return await http.put<PricingData>(`/pricing/${id}`, data);
     } catch (error: unknown) {
-      const apiError = error as ApiError;
       return {
         success: false,
-        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật giá',
+        message: error instanceof Error ? error.message : 'Có lỗi xảy ra khi cập nhật giá',
         messageId: '',
       };
     }
@@ -164,18 +112,11 @@ class PricingService {
 
   async deletePricing(id: string): Promise<ApiResponse<void>> {
     try {
-      const response = await httpRequest.delete<ApiResponse<void>>(`/pricing/${id}`);
-      return {
-        success: response.data.success,
-        message: response.data.message || 'Xóa giá thành công',
-        messageId: response.data.messageId,
-        detailErrors: response.data.detailErrors,
-      };
+      return await http.delete<void>(`/pricing/${id}`);
     } catch (error: unknown) {
-      const apiError = error as ApiError;
       return {
         success: false,
-        message: apiError?.response?.data?.message || 'Có lỗi xảy ra khi xóa giá',
+        message: error instanceof Error ? error.message : 'Có lỗi xảy ra khi xóa giá',
         messageId: '',
       };
     }

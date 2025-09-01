@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Phone, Mail, MapPin, User, LogOut, UserCircle, ChevronDown, DollarSign } from 'lucide-react'
+import { Menu, X, Phone, Mail, MapPin, User, LogOut, UserCircle, ChevronDown, DollarSign, ShoppingCart, BarChart3 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { NAVIGATION_ITEMS, CONTACT_INFO } from '@/constants'
@@ -19,6 +19,166 @@ export default function Header() {
         logout()
         setIsUserMenuOpen(false)
         window.location.href = '/'
+    }
+
+    const renderAuthSection = () => {
+        if (loading) {
+            return <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+        }
+
+        if (isAuthenticated && user) {
+            return (
+                <div className="relative">
+                    <motion.button
+                        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                        className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 ${
+                            isScrolled 
+                                ? 'bg-green-50 text-green-700 hover:bg-green-100' 
+                                : 'bg-white/10 text-green-700 hover:bg-white/20'
+                        }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        <UserCircle className="w-5 h-5" />
+                        <span className="font-medium">{user.name}</span>
+                        <ChevronDown className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                    </motion.button>
+
+                    <AnimatePresence>
+                        {isUserMenuOpen && (
+                            <motion.div
+                                className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2"
+                                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <div className="px-4 py-3 border-b border-gray-100">
+                                    <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                                    <p className="text-sm text-gray-500">{user.phoneNumber}</p>
+                                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${
+                                        user.role === 'Admin' 
+                                            ? 'bg-blue-100 text-blue-700' 
+                                            : 'bg-green-100 text-green-700'
+                                    }`}>
+                                        {user.role === 'Admin' ? 'Chủ cửa hàng' : 'Khách hàng'}
+                                    </span>
+                                </div>
+
+                                <div className="py-1">
+                                    {/* Admin exclusive features */}
+                                    {user.role === 'Admin' && (
+                                        <>
+                                            <a
+                                                href="/admin/dashboard"
+                                                className="flex items-center w-full px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 transition-colors"
+                                                onClick={() => setIsUserMenuOpen(false)}
+                                            >
+                                                <BarChart3 className="w-4 h-4 mr-3" />
+                                                Dashboard
+                                            </a>
+                                            <a
+                                                href="/admin/daily-price"
+                                                className="flex items-center w-full px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 transition-colors"
+                                                onClick={() => setIsUserMenuOpen(false)}
+                                            >
+                                                <DollarSign className="w-4 h-4 mr-3" />
+                                                Đăng giá hôm nay
+                                            </a>
+                                            <a
+                                                href="/admin/orders"
+                                                className="flex items-center w-full px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 transition-colors border-b border-gray-100"
+                                                onClick={() => setIsUserMenuOpen(false)}
+                                            >
+                                                <ShoppingCart className="w-4 h-4 mr-3" />
+                                                Quản lý đơn hàng
+                                            </a>
+                                        </>
+                                    )}
+
+                                    <Link
+                                        href="/profile"
+                                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                        onClick={() => setIsUserMenuOpen(false)}
+                                    >
+                                        <User className="w-4 h-4 mr-3" />
+                                        Thông tin cá nhân
+                                    </Link>
+
+                                    <button
+                                        onClick={handleLogout}
+                                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                    >
+                                        <LogOut className="w-4 h-4 mr-3" />
+                                        Đăng xuất
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            )
+        }
+
+        return (
+            <div className="flex items-center space-x-3">
+                <Link href="/login">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className={`${
+                            isScrolled 
+                                ? 'border-green-500 text-green-600 hover:bg-green-50' 
+                                : 'border-green-500 text-green-600 hover:bg-white/10'
+                        }`}
+                    >
+                        Đăng nhập
+                    </Button>
+                </Link>
+                <Link href="/register">
+                    <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl"
+                    >
+                        Đăng ký
+                    </Button>
+                </Link>
+            </div>
+        )
+    }
+
+    const renderMobileAdminMenu = () => {
+        if (user?.role === 'Admin') {
+            return (
+                <>
+                    <a
+                        href="/admin/dashboard"
+                        className="flex items-center py-2 text-blue-700 hover:text-blue-800 transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        <BarChart3 className="w-4 h-4 mr-3" />
+                        Dashboard
+                    </a>
+                    <a
+                        href="/admin/daily-price"
+                        className="flex items-center py-2 text-blue-700 hover:text-blue-800 transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        <DollarSign className="w-4 h-4 mr-3" />
+                        Đăng giá hôm nay
+                    </a>
+                    <a
+                        href="/admin/orders"
+                        className="flex items-center py-2 text-blue-700 hover:text-blue-800 transition-colors"
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        <ShoppingCart className="w-4 h-4 mr-3" />
+                        Quản lý đơn hàng
+                    </a>
+                </>
+            )
+        }
+        return null
     }
 
     return (
@@ -110,7 +270,7 @@ export default function Header() {
                                     className={`font-medium transition-colors duration-300 ${
                                         isScrolled
                                             ? 'text-gray-700 hover:text-green-600'
-                                            : 'text-white hover:text-green-200'
+                                            : 'text-green-600 hover:text-green-200'
                                     }`}
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
@@ -121,107 +281,7 @@ export default function Header() {
 
                             {/* Auth Section */}
                             <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-white/20">
-                                {loading ? (
-                                    <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
-                                ) : isAuthenticated && user ? (
-                                    /* Authenticated User Menu */
-                                    <div className="relative">
-                                        <motion.button
-                                            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                                            className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 ${
-                                                isScrolled 
-                                                    ? 'bg-green-50 text-green-700 hover:bg-green-100' 
-                                                    : 'bg-white/10 text-white hover:bg-white/20'
-                                            }`}
-                                            whileHover={{ scale: 1.02 }}
-                                            whileTap={{ scale: 0.98 }}
-                                        >
-                                            <UserCircle className="w-5 h-5" />
-                                            <span className="font-medium">{user.name}</span>
-                                            <ChevronDown className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
-                                        </motion.button>
-
-                                        <AnimatePresence>
-                                            {isUserMenuOpen && (
-                                                <motion.div
-                                                    className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2"
-                                                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                                                    transition={{ duration: 0.2 }}
-                                                >
-                                                    <div className="px-4 py-3 border-b border-gray-100">
-                                                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                                                        <p className="text-sm text-gray-500">{user.phoneNumber}</p>
-                                                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium mt-1 ${
-                                                            user.role === 'Admin' 
-                                                                ? 'bg-blue-100 text-blue-700' 
-                                                                : 'bg-green-100 text-green-700'
-                                                        }`}>
-                                                            {user.role === 'Admin' ? 'Chủ cửa hàng' : 'Khách hàng'}
-                                                        </span>
-                                                    </div>
-
-                                                    <div className="py-1">
-                                                        {/* Admin exclusive feature */}
-                                                        {user.role === 'Admin' && (
-                                                            <a
-                                                                href="/admin/daily-price"
-                                                                className="flex items-center w-full px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 transition-colors border-b border-gray-100"
-                                                                onClick={() => setIsUserMenuOpen(false)}
-                                                            >
-                                                                <DollarSign className="w-4 h-4 mr-3" />
-                                                                Đăng giá hôm nay
-                                                            </a>
-                                                        )}
-
-                                                        <Link
-                                                            href="/profile"
-                                                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                                                            onClick={() => setIsUserMenuOpen(false)}
-                                                        >
-                                                            <User className="w-4 h-4 mr-3" />
-                                                            Thông tin cá nhân
-                                                        </Link>
-
-                                                        <button
-                                                            onClick={handleLogout}
-                                                            className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                                                        >
-                                                            <LogOut className="w-4 h-4 mr-3" />
-                                                            Đăng xuất
-                                                        </button>
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-                                ) : (
-                                    /* Unauthenticated Auth Buttons */
-                                    <div className="flex items-center space-x-3">
-                                        <Link href="/login">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className={`${
-                                                    isScrolled 
-                                                        ? 'border-green-500 text-green-600 hover:bg-green-50' 
-                                                        : 'border-white text-white hover:bg-white/10'
-                                                }`}
-                                            >
-                                                Đăng nhập
-                                            </Button>
-                                        </Link>
-                                        <Link href="/register">
-                                            <Button
-                                                size="sm"
-                                                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl"
-                                            >
-                                                Đăng ký
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                )}
+                                {renderAuthSection()}
 
                                 {/* Call Button */}
                                 <motion.a
@@ -294,16 +354,7 @@ export default function Header() {
                                 <div className="pt-4 border-t border-gray-200 space-y-3">
                                     {isAuthenticated ? (
                                         <div className="space-y-2">
-                                            {/* Admin exclusive feature for mobile */}
-                                            {user?.role === 'Admin' && (
-                                                <a
-                                                    href="/admin/daily-price"
-                                                    className="flex items-center py-2 text-blue-700 hover:text-blue-800 transition-colors"
-                                                >
-                                                    <DollarSign className="w-4 h-4 mr-3" />
-                                                    Đăng giá hôm nay
-                                                </a>
-                                            )}
+                                            {renderMobileAdminMenu()}
 
                                             <Link
                                                 href="/profile"

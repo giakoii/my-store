@@ -178,7 +178,7 @@ export default function PricingPage() {
                     >
                       <DailyPriceCard
                         title={batch.title}
-                        date={new Date(new Date(batch.createdAt).getTime() + (7 * 60 * 60 * 1000)).toLocaleDateString('vi-VN', {
+                        date={new Date(new Date(batch.createdAt).getTime()).toLocaleDateString('vi-VN', {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric',

@@ -4,15 +4,10 @@ import { LoginData, User, ApiResponse, UserRoleResponse, SessionResponse } from 
 import { localStorage } from '@/utils';
 
 class AuthService {
-  private readonly baseUrl: string;
-
-  constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7001';
-  }
 
   async checkUserRole(phoneNumber: string): Promise<ApiResponse<UserRoleResponse>> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/v1/User/user-role`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/User/user-role`, {
         method: 'POST',
         headers: {
           'accept': 'application/json',
@@ -50,7 +45,7 @@ class AuthService {
 
   async login(data: LoginData): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${this.baseUrl}/connect/token`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/connect/token`, {
         method: 'POST',
         headers: {
           'accept': 'application/json, text/plain, */*',
@@ -112,7 +107,7 @@ class AuthService {
         };
       }
 
-      const response = await fetch(`${this.baseUrl}/session`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/session`, {
         method: 'GET',
         headers: {
           'accept': 'application/json',
@@ -147,7 +142,7 @@ class AuthService {
   // Register API
   async register(data: { fullName: string; phoneNumber: string }): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/v1/User/create`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/User/create`, {
         method: 'POST',
         headers: {
           'accept': 'application/json',

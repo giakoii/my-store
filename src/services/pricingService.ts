@@ -11,16 +11,30 @@ interface ApiError {
 }
 
 class PricingService {
+  /**
+   * Get batch pricings with optional pagination and date filters
+   * @param params
+   */
   async getBatchPricings(params?: PricingPaginationRequest): Promise<ApiResponse<BatchPricingListResponse>> {
     try {
       const queryParams = new URLSearchParams();
 
+      // Append query parameters if they exist
       if (params?.page) queryParams.append('Page', params.page.toString());
+
+      // Append pageSize only if it's provided and greater than 0
       if (params?.pageSize) queryParams.append('PageSize', params.pageSize.toString());
+
+      // Append date filters if they exist
       if (params?.fromDate) queryParams.append('FromDate', params.fromDate);
+
+      // Append toDate only if it exists
       if (params?.toDate) queryParams.append('ToDate', params.toDate);
 
+      // Construct the full URL with query parameters
       const queryString = queryParams.toString();
+
+      // Make the GET request to the API
       const url = `/api/v1/Pricing/batches${queryString ? `?${queryString}` : ''}`;
       const response = await httpRequest.get<ApiPricingResponse>(url);
 
@@ -51,8 +65,13 @@ class PricingService {
     }
   }
 
+  /**
+   * Create a new batch pricing
+   * @param data
+   */
   async createBatchPricing(data: BatchPricingRequest): Promise<ApiResponse<BatchPricingResponse>> {
     try {
+      // Send POST request to create a new batch pricing
       const response = await httpRequest.post<ApiResponse<BatchPricingResponse>>('/api/v1/Pricing/batch', data);
       return {
         success: response.data.success,
@@ -71,6 +90,10 @@ class PricingService {
     }
   }
 
+  /**
+   * Get pricings transformed from batch pricings
+   * @param params
+   */
   async getPricings(params?: PricingPaginationRequest): Promise<ApiResponse<PricingData[]>> {
     const result = await this.getBatchPricings(params);
     if (result.success && result.response?.data) {
@@ -80,7 +103,7 @@ class PricingService {
           name: detail.typeName || `Loại ${detail.productTypeId}`,
           price: detail.price,
           unit: 'VND/kg',
-          createAt: batch.createdAt || new Date().toISOString(),
+          createAt: batch.createdAt,
         }))
       );
       return {

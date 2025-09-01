@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, DollarSign, Save, TrendingUp, Calendar, Package, X } from 'lucide-react'
 import Header from '@/components/Header'
@@ -139,8 +139,12 @@ export default function AdminDailyPricePage() {
           price: parseInt(price)
         }))
 
-      if (priceDetails.length === 0) {
-        setError('Vui lòng nhập ít nhất một giá sản phẩm')
+      const missingPrices = productTypes.some(
+          type => !priceForm.prices[type.productTypeId] || priceForm.prices[type.productTypeId].trim() === ''
+      )
+      if (missingPrices) {
+        setError('Vui lòng nhập giá cho tất cả các loại mít')
+        setSubmitting(false)
         return
       }
 
@@ -213,31 +217,6 @@ export default function AdminDailyPricePage() {
               Đăng và quản lý giá mít hằng ngày cho khách hàng
             </p>
           </motion.div>
-
-          {/* Success/Error Messages */}
-          <AnimatePresence>
-            {success && (
-              <motion.div
-                className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-center"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                {success}
-              </motion.div>
-            )}
-
-            {error && (
-              <motion.div
-                className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-center"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                {error}
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Price Form */}
@@ -326,6 +305,19 @@ export default function AdminDailyPricePage() {
                       ))}
                     </div>
                   </div>
+                  {/* Success/Error Messages */}
+                  <AnimatePresence>
+                    {error && (
+                        <motion.div
+                            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-center"
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                        >
+                          {error}
+                        </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   {/* Submit Button */}
                   <Button

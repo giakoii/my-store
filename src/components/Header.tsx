@@ -220,18 +220,18 @@ export default function Header() {
 
             {/* Main Header */}
             <motion.header
-                className={`fixed w-full top-[42px] z-40 transition-all duration-300 ${
-                    isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
-                }`}
+                className={`fixed w-full top-[42px] z-50 transition-all duration-300 ${
+                    isScrolled || true ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+                } lg:top-[42px] max-lg:top-0 max-lg:bg-white/95 max-lg:backdrop-blur-md max-lg:shadow-lg`}
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.6 }}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center py-4">
-                        {/* Logo */}
+                    <div className="flex justify-between items-center py-3 lg:py-4">
+                        {/* Logo - Compact on mobile */}
                         <motion.div
-                            className="flex items-center space-x-3"
+                            className="flex items-center space-x-2 lg:space-x-3"
                             whileHover={{ scale: 1.05 }}
                             transition={{ duration: 0.2 }}
                         >
@@ -240,22 +240,22 @@ export default function Header() {
                                     <Image
                                         alt="Vựa mít Khoa"
                                         src="/images/logo.png"
-                                        width={48}
-                                        height={48}
-                                        className="rounded-full shadow-lg"
+                                        width={40}
+                                        height={40}
+                                        className="lg:w-12 lg:h-12 rounded-full shadow-lg"
                                     />
                                     <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-green-400/20 to-transparent"></div>
                                 </div>
                             </Link>
                             <div>
                                 <Link href="/">
-                                    <h1 className={`text-2xl font-bold ${isScrolled ? 'text-gray-800' : 'text-white'}`}>
+                                    <h1 className={`text-lg lg:text-2xl font-bold ${isScrolled ? 'text-gray-800' : 'text-white max-lg:text-gray-800'}`}>
                                         <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                                             Vựa Mít Khoa
                                         </span>
                                     </h1>
                                 </Link>
-                                <p className={`text-sm ${isScrolled ? 'text-gray-600' : 'text-green-100'}`}>
+                                <p className={`text-xs lg:text-sm ${isScrolled ? 'text-gray-600' : 'text-green-100 max-lg:text-gray-600'}`}>
                                     Thu mua mít giá cao
                                 </p>
                             </div>
@@ -297,7 +297,7 @@ export default function Header() {
 
                         {/* Mobile menu button */}
                         <motion.button
-                            className={`lg:hidden p-2 rounded-lg ${isScrolled ? 'text-gray-700' : 'text-white'}`}
+                            className={`lg:hidden p-2 rounded-lg ${isScrolled ? 'text-gray-700' : 'text-white max-lg:text-gray-700'}`}
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             whileTap={{ scale: 0.95 }}
                         >
